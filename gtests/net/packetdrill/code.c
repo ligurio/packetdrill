@@ -349,11 +349,13 @@ static void text_free(struct code_text *text)
 }
 
 /* Allocate a new empty struct code_data struct. */
+#if HAVE_SO_MEMINFO || HAVE_TCP_CC_INFO || HAVE_TCP_INFO
 static struct code_data *data_new(void)
 {
 	struct code_data *data = calloc(1, sizeof(struct code_data));
 	return data;
 }
+#endif
 
 /* Free the given data and all storage to which it points. */
 static void data_free(struct code_data *data)
@@ -501,6 +503,7 @@ static void append_text(struct code_state *code,
  * format configured earlier by the user for this script.
  * Takes ownership of the malloc-allocated buffer and frees it.
  */
+#if HAVE_SO_MEMINFO || HAVE_TCP_CC_INFO || HAVE_TCP_INFO
 static void append_data(struct code_state *code, enum code_data_t data_type,
 			void *data_buffer, int data_len)
 {
@@ -514,6 +517,7 @@ static void append_data(struct code_state *code, enum code_data_t data_type,
 	fragment->contents.data = data;
 	append_fragment(code, fragment);
 }
+#endif
 
 struct code_state *code_new(struct config *config)
 {
@@ -665,6 +669,7 @@ int code_execute(struct code_state *code, char **error)
  * On success, return a pointer the filled-in buffer (allocated by malloc);
  * on failure, return NULL.
  */
+#if HAVE_SO_MEMINFO || HAVE_TCP_CC_INFO || HAVE_TCP_INFO
 static void *get_data(struct state *state, struct event *event,
 		      int fd, enum code_data_t data_type, int *len)
 {
@@ -715,6 +720,7 @@ static void *get_data(struct state *state, struct event *event,
 	*len = opt_len;
 	return data;
 }
+#endif
 
 void run_code_event(struct state *state, struct event *event,
 			    const char *text)
@@ -730,13 +736,14 @@ void run_code_event(struct state *state, struct event *event,
 		asprintf(&error, "no socket to use for code");
 		goto error_out;
 	}
-	int fd = state->socket_under_test->fd.live_fd;
 	struct code_state *code = state->code;
 
 	void *data = NULL;
 	void *data_ext = NULL;
-	void *data_meminfo = NULL;
+#if HAVE_TCP_INFO || HAVE_TCP_CC_INFO
+	int fd = state->socket_under_test->fd.live_fd;
 	int  data_len = 0;
+#endif
 #if HAVE_TCP_INFO
 	code->data_type = DATA_TCP_INFO;
 	data = get_data(state, event, fd, code->data_type, &data_len);
@@ -760,6 +767,7 @@ void run_code_event(struct state *state, struct event *event,
 	}
 #endif  /* HAVE_TCP_CC_INFO */
 #if HAVE_SO_MEMINFO
+	void *data_meminfo = NULL;
 	code->data_type = DATA_SO_MEMINFO;
 	data_meminfo = get_data(state, event, fd, code->data_type, &data_len);
 	if (data_meminfo)
