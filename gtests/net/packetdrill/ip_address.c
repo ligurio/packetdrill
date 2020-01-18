@@ -374,6 +374,6 @@ void generate_random_ipv6_addr(char *result, const char *base, int prefixlen)
 		rnd++;
 	if (rnd == mask)
 		rnd--;
-	addr.ip.v6.s6_addr32[3] |= htonl(rnd);
+	//addr.ip.v6.s6_addr32[3] |= htonl(rnd);
 	ip_to_string(&addr, result);
 }
