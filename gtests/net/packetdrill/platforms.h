@@ -44,6 +44,16 @@
 
 #else
 
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+
+typedef signed char s8;
+typedef signed short s16;
+typedef signed int s32;
+typedef signed long long s64;
+
 /* The underscore variants of the kernel-style names are defined in
  * linux/types.h, but we must define them explicitly for other platforms. */
 typedef u8 __u8;
@@ -91,10 +101,10 @@ typedef u32 __wsum;
 #define TUN_PATH                "/dev/tun0"
 #define TUN_DEV                 "tun0"
 
+#define HAVE_FMEMOPEN           1
 #define HAVE_TCP_INFO           0
 
 #include "open_memstream.h"
-#include "fmemopen.h"
 
 #define __always_inline __attribute__((__always_inline__))
 
