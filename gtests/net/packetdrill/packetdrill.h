@@ -34,7 +34,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include <sys/epoll.h>
+//#include <sys/epoll.h>
 #include <unistd.h>
 
 struct packetdrill_interface {
@@ -92,14 +92,18 @@ struct packetdrill_interface {
 	int (*usleep)(void *userdata, useconds_t usec);
 	int (*gettimeofday)(void *userdata, struct timeval *tv,
 			    struct timezone *tz);
+/*
 	int (*epoll_create)(void *userdata, int size);
 	int (*epoll_ctl)(void *userdata, int epfd, int op, int fd,
 			 struct epoll_event *event);
 	int (*epoll_wait)(void *userdata, int epfd, struct epoll_event *events,
 			  int maxevents, int timeout);
+*/
 	int (*pipe)(void *userdata, int pipefd[2]);
+/*
 	int (*splice)(void *userdata, int fd_in, loff_t *off_in, int fd_out,
 		      loff_t *off_out, size_t len, unsigned int flags);
+*/
 };
 
 typedef void (*packetdrill_interface_init_t)(const char *flags,
