@@ -29,7 +29,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#ifdef linux
 #include <linux/netlink.h>
+#endif
 #include <netinet/in.h>
 #include <poll.h>
 #include <pthread.h>
@@ -40,8 +42,12 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/uio.h>
+#if !defined(__OpenBSD__)
 #include <sys/sendfile.h>
+#endif
+#ifdef linux
 #include <sys/epoll.h>
+#endif
 #include <time.h>
 #include <unistd.h>
 #include "assert.h"
@@ -395,6 +401,7 @@ static inline int list_length(struct expression_list *list)
 	return length;
 }
 
+#ifdef linux
 int add_nla(void *dst, int type, int len, const void *data)
 {
 	struct nlattr *nla = (struct nlattr *) dst;
@@ -479,6 +486,7 @@ static int nla_expr_list_to_nla(struct expression_list *list,
 	*len = dst - start;
 	return STATUS_OK;
 }
+#endif /* linux */
 
 /* Fill in the values of sock_extended_err structure from the expression. */
 static int new_extended_err(const struct sock_extended_err_expr *expr,
@@ -500,6 +508,7 @@ static int new_extended_err(const struct sock_extended_err_expr *expr,
 	return STATUS_OK;
 }
 
+#ifdef linux
 /* Info for various TCP NLAs */
 struct nla_type_info tcp_nla[] = {
 	[_TCP_NLA_PAD] = {"TCP_NLA_PAD", sizeof(u32)},
@@ -527,6 +536,7 @@ struct nla_type_info tcp_nla[] = {
 	[_TCP_NLA_REORD_SEEN] = {"TCP_NLA_REORD_SEEN", sizeof(u32)},
 	[_TCP_NLA_SRTT] = {"TCP_NLA_SRTT", sizeof(u32)},
 };
+#endif
 
 /* Allocate and fill a msg_control described by the given expression.
  * Return STATUS_OK if the expression is a valid msg_control.
