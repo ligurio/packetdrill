@@ -10,6 +10,7 @@
 #ifdef HAVE_SYS_CAPABILITY_H
 #include <sys/capability.h>
 #else
+#ifdef linux
 #include <linux/capability.h>
 
 typedef struct __user_cap_data_struct *cap_t;
@@ -97,6 +98,7 @@ cap_free(void *capabilities)
 	free(capabilities);
 	return 0;
 }
+#endif /* linux */
 
 #endif /* !HAVE_SYS_CAPABILITY_H */
 #endif /* _LINUX_GTESTS_NET_CAPABILITY_H */
